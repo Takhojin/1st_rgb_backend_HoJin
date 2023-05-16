@@ -63,26 +63,39 @@ JavaScript / NodeJS / Mysql
 ##DB 구성
 - 1차 프로젝트로써 서로 프로젝트는 처음 하기 때문에, 기본적인 CRUD 기능만 구현하기로함
 - cart 테이블은 결제 완료시 삭제되는 테이블로 써 많은 양의 데이터가 필요하지 않아, userid,productid,quantity만 입력
-- 
 
 ##layerd pattern 적용
 - 유지,보수 추후 확장성을 고려하여 layerd pattern 적용
-- 
 
 ## Login/Sign Up
-- 유효성 검사 불만족 시 EMAIL OR PASSWORD INVALID 문구 출력
-- 회원가입 시 비밀번호 해쉬화
-- 로그인시 입력된 비밀번호와 저장된 해쉬화된 비밀번호 비교 / 확인 시 토큰 발급
-- 회원 가입 시 , 토큰을 발급하여, 회원가입 후 따로 로그인 과정이 필요하지 않게 함
 
+- 회원가입 시 비밀번호 해쉬화회원가입
+- 회원가입 , 로그인 정규화를 적용하여 email, password 둘중 하나라도 정규화에 맞지않을 경우 error노출
+- password는 해쉬화를 진행하여 보안성을 유지
+- 회원가입 시 불필요하게 많은 동작이 필요없도록 조치
+  1) 회원가입시 받는 데이터의 갯수를 줄임 ( 이메일, 패스워드 , 약관동의, 이름, 정보만 기입 )
+  2) 회원가입 성공시 바로 토큰을 발행하여 따로 로그인창으로 갈 필요가 없음
+- 로그인시 JWT 토큰을 이용하여 토큰을 발급
+- 토큰 payload에는 보안을 위해 userid만 담겨있음.
+- 따라서 이후의 모든 api에서 user의 데이터가 필요할 경우 userid가 담긴 payload를 분해하여 userid로 user의 데이터를 조회하도록 설계
 ## Product List/Detail
 #### 판매중인 상품들을 필터 적용하여 사용자의 접근성을 높인 상품리스트/페이지 <br>
 - 
 
 
 ## Cart
-- 장바구니 수량 추가, 상품 리스트 삭제 기능 <br>
-- 장바구니 GET, PATCH, DELETE API로 상품 효율적 관리 <br>
+
+- DB설계시 장바구니 테이블 ( cart )은 휘발성 테이블로 생각하고 많은 정보를 담지않도록 설계, 따라서 userId,productId,quantit의 column만이 존재
+- 데이터의 고유 식별번호는 존재할 필요성이 있다고 생각하여 cart.id도 존재
+- 로그인시 발급된 jwt토큰에서 userid와 사용자가 선택한 상품의 productid를 불러와 cart테이블의 저장
+- ( userid , productid )의 두 column을 묶어서 unique 속성을 주어 중복된 값이 들어가지 않도록 설정
+- 만약 중복된 값이 또 들어올 경우, 수량을 더하는 조건을 사용 ( on duplication )
+- 중복되지 않은 값이 들어올 경우 새로운 row를 추가
+- 마지막으로 그 결과값을 반환 
+- 장바구니상에서 수량을 변경할 경우 http method 중 patch를 사용하고 path parmeter로 cartId를 받도록 설계, body값으로 수량을 받도록 하여
+  cartid : ? 번 짜리 row에 quantity 값을 변경하도록 api설계
+- 장바구니에서 x를 누를 경우 장바구니 table에서 해당 row가 삭제되도록 설계 ( cartid ) 기준으로 
+- 위와 같은 api들이 적용 될 수 있도록 장바구니 모양 아이콘을 클릭했을 경우 get method를 이용하여 userid 를 토큰으로 받아 사용자의 cart table을 반환하도록 설계
 
 ## Order/Payment
 -
