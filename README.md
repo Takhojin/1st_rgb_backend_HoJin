@@ -79,8 +79,12 @@ JavaScript / NodeJS / Mysql
 - 토큰 payload에는 보안을 위해 userid만 담겨있음.
 - 따라서 이후의 모든 api에서 user의 데이터가 필요할 경우 userid가 담긴 payload를 분해하여 userid로 user의 데이터를 조회하도록 설계
 ## Product List/Detail
-#### 판매중인 상품들을 필터 적용하여 사용자의 접근성을 높인 상품리스트/페이지 <br>
-- 
+
+-상품 전체 가져오기 또는 상품디테일 가져오기 옵션
+-상품 불러오기시 category 테이블 참조
+-product_images 테이블 따로 관리로 JSONARRAY로 프로덕트 아이디 별 여러 사진 불러오기 가능
+-query parameter 지원으로 프론트에서 pagenation 가능
+-상품 갯수 및 재고 테이블에서 관리 (품절시 품절된 부분에 대해 표시 가능)
 
 
 ## Cart
@@ -98,11 +102,15 @@ JavaScript / NodeJS / Mysql
 - 위와 같은 api들이 적용 될 수 있도록 장바구니 모양 아이콘을 클릭했을 경우 get method를 이용하여 userid 를 토큰으로 받아 사용자의 cart table을 반환하도록 설계
 
 ## Order/Payment
--
+
+-transaction 도입
+-재고 수량 확인후, 재고가 있을때만 결제가 가능
+-결제후 유저의 포인트 차감기능
+-UUID로 결제 완료후 안전하게 결제번호 저장
 
 ## Invoice
 
+-order 테이블로 상품결제 및 상품 정보 또는 수량등 order 정보 불러오기 가능
 
-## Nav/Footer 
 
 
